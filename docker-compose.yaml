@@ -1,0 +1,103 @@
+version: "3.8"
+
+volumes:
+  cybulde-model_mlflow-artifact-store:
+    external: true
+  cybulde-model_postgresql-mlflow-data:
+    external: true
+
+services:
+  mlflow-db:
+    container_name: mlflow-backend-store
+    image: postgres:14
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
+      - .envs/.postgres
+    volumes:
+      - cybulde-model_postgresql-mlflow-data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+
+  mlflow-server:
+    user: root
+    hostname: emkademy
+    container_name: mlflow-server-web-app-container
+    image: mlflow-server-web-app
+    build:
+      context: .
+      dockerfile: ./docker/mlflow.Dockerfile
+      args:
+        USER_NAME: "${USER_NAME:-kyuksel}"
+        USER_ID: "${USER_ID:-1000}"
+    ports:
+      - 6101:6101
+    ipc: host
+    init: true
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
+      - .envs/.postgres
+    volumes:
+      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+      - cybulde-model_mlflow-artifact-store:/mlflow-artifact-store
+    depends_on:
+      - mlflow-db
+
+  cybulde-data-processing:
+    user: root
+    hostname: emkademy
+    container_name: cybulde-data-processing-web-app
+    image: ${CYBULDE_DATA_PROCESSING_GCP_DOCKER_IMAGE}
+    ports:
+      - 8000:8000
+    ipc: host
+    init: true
+    volumes:
+      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+
+  cybulde-model:
+    user: root
+    hostname: emkademy
+    container_name: cybulde-model-web-app
+    image: ${CYBULDE_MODEL_GCP_DOCKER_IMAGE}
+    ports:
+      - 8001:8001
+    ipc: host
+    init: true
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
+      - .envs/.postgres
+    volumes:
+      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+      - cybulde-model_mlflow-artifact-store:/mlflow-artifact-store
+    depends_on:
+      - mlflow-server
+
+  app:
+    user: "${USER_ID:-1000}"
+    hostname: "${HOST_NAME:-emkademy}"
+    image: cybulde-web-app
+    container_name: cybulde-web-app
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        USER_NAME: "${USER_NAME:-kyuksel}"
+        USER_ID: "${USER_ID:-1000}"
+    volumes:
+      - ./:/app/
+      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+    ports:
+      - 8080:8080
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ipc: host
+    init: true

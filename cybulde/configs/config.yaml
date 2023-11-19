@@ -1,0 +1,39 @@
+defaults:
+  - override hydra/job_logging: custom
+  - override hydra/hydra_logging: disabled
+  - _self_
+
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+dataset_path: gs://emkademy/cybulde/processed-data/rebalanced-splits/test.parquet
+data_processing_service_url: http://cybulde-data-processing:8000/process_data
+model_prediction_service_url: http://cybulde-model:8001/predict_cyberbullying
+
+harmless_gifs:
+  - https://media.giphy.com/media/KzmpteXXW9soJldiI7/giphy.gif
+  - https://media.giphy.com/media/g2CTRGYcGBHSr1A2bB/giphy.gif
+  - https://media.giphy.com/media/FbZYCW78PANyM/giphy.gif
+  - https://media.giphy.com/media/eHcyHQdfPMrDJ6fCXs/giphy.gif
+  - https://media.giphy.com/media/NUwoRZzHc2Bws/giphy.gif
+  - https://media.giphy.com/media/hpnRtHDXmzhLO/giphy.gif
+  - https://media.giphy.com/media/NZIlOR29UF3k4/giphy.gif
+  - https://media.giphy.com/media/1qZ7MqxnR0eRxJksLs/giphy.gif
+  - https://media.giphy.com/media/RmuPbrXTmdXrO/giphy.gif
+  - https://media.giphy.com/media/bdaMVCP6bPIVWc0B3g/giphy.gif
+  - https://media.giphy.com/media/V6BTj0jsJsfCiincY9/giphy.gif
+
+cyberbullying_gifs:
+  - https://media.giphy.com/media/GBIzZdF3AxZ6/giphy.gif
+  - https://media.giphy.com/media/3orif03ZpPZgIXARQ4/giphy.gif
+  - https://media.giphy.com/media/GY0HLBmOkEnFT1n7Eg/giphy.gif
+  - https://media.giphy.com/media/XEfokGeXzYrV9lfC4f/giphy.gif
+  - https://media.giphy.com/media/cNw6s3YTfCanZkqomd/giphy.gif
+  - https://media.giphy.com/media/xUNd9XpqBN5grX3rk4/giphy.gif
+  - https://media.giphy.com/media/26FeWAqoAV3WDYFby/giphy.gif
+  - https://media.giphy.com/media/3o6Zt4EeTpfkoXIynm/giphy.gif
+  - https://media.giphy.com/media/l0HlFyXlSYV86nljG/giphy.gif
+  - https://media.giphy.com/media/xUOxeVZuGMI7kCM5Z6/giphy.gif
+  - https://media.giphy.com/media/iePazPfAYPL2b9pZyF/giphy.gif
